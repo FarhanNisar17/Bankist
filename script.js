@@ -80,9 +80,10 @@ const displayMovements = function (movements) {
 
 displayMovements(account1.movements);
 
+// create unique username property on our users
 const createUsernames = function (accs) {
-  accs.forEach(function (accs) {
-    accs.username = accs.user   // username property ban gayi accounts mai
+  accs.forEach(function (acc) {
+    acc.username = acc.owner
       .toLowerCase()
       .split(' ')
       .map(name => name[0])
@@ -91,3 +92,26 @@ const createUsernames = function (accs) {
 };
 
 createUsernames(accounts);
+
+console.log(accounts);
+
+// Event handlers
+let currentAccount;
+
+btnLogin.addEventListener('click', function (e) {
+  e.preventDefault();
+  currentAccount = accounts.find(
+    acc => acc.username === inputLoginUsername.value
+  );
+  console.log(currentAccount);
+
+  if (currentAccount?.pin === Number(inputLoginPin.value)) {
+    //Display UI and message
+    labelWelcome.textContent = `Welcome back, ${
+      currentAccount.owner.split(' ')[0]
+    }`;
+
+    console.log(labelWelcome);
+    console.log('login');
+  }
+});
