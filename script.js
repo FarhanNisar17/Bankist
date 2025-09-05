@@ -78,9 +78,36 @@ const displayMovements = function (movements) {
   });
 };
 
-displayMovements(account1.movements);
+// Balance Calculation
+const calcDisplayBalance = function (movements) {
+  const balance = movements.reduce((acc, mov) => acc + mov, 0);
+  labelBalance.textContent = `${balance}€`;
+};
 
-// create unique username property on our users
+// Displaying Summary
+const calcDisplaySummary = function (acc) {
+  const income = acc.movements
+    .filter(mov => mov > 0)
+    .reduce((acc, mov) => acc + mov, 0);
+  labelSumIn.textContent = `${income}€`;
+
+  const out = acc.movements
+    .filter(mov => mov < 0)
+    .reduce((acc, mov) => acc + mov, 0);
+  labelSumOut.textContent = `${Math.abs(out)}€`;
+
+  const interest = acc.movements
+    .filter(mov => mov > 0)
+    .map(deposit => (deposit * acc.interestRate) / 100)
+    .filter((int, i, arr) => {
+      console.log(arr);
+      return int >= 1;
+    })
+    .reduce((acc, int) => acc + int, 0);
+  labelSumInterest.textContent = `${interest}€`;
+};
+
+// Create unique username property on our users
 const createUsernames = function (accs) {
   accs.forEach(function (acc) {
     acc.username = acc.owner
@@ -93,10 +120,8 @@ const createUsernames = function (accs) {
 
 createUsernames(accounts);
 
-console.log(accounts);
-
-// Event handlers
-let currentAccount;
+// ###Event handling
+let currentAccount; // makes shitt dynamic
 
 btnLogin.addEventListener('click', function (e) {
   e.preventDefault();
@@ -110,8 +135,18 @@ btnLogin.addEventListener('click', function (e) {
     labelWelcome.textContent = `Welcome back, ${
       currentAccount.owner.split(' ')[0]
     }`;
+    containerApp.style.opacity = 100;
 
-    console.log(labelWelcome);
-    console.log('login');
+    inputLoginUsername.value = inputLoginPin.value = '';
+    inputLoginPin.blur();
+
+    //Display Movements
+    displayMovements(currentAccount.movements);
+
+    //Display Balance
+    calcDisplayBalance(currentAccount.movements);
+
+    //Display Summary
+    calcDisplaySummary(currentAccount);
   }
 });
