@@ -11,14 +11,14 @@ const account1 = {
   interestRate: 1.2, // %
   pin: 1111,
   movementsDates: [
-    '2019-11-18T21:31:17.178Z',
-    '2019-12-23T07:42:02.383Z',
-    '2020-01-28T09:15:04.904Z',
-    '2020-04-01T10:17:24.185Z',
-    '2020-05-08T14:11:59.604Z',
-    '2020-07-26T17:01:17.194Z',
-    '2020-07-28T23:36:17.929Z',
-    '2020-08-01T10:51:36.790Z',
+    '2024-11-18T21:31:17.178Z',
+    '2024-12-23T07:42:02.383Z',
+    '2025-01-28T09:15:04.904Z',
+    '2025-04-01T10:17:24.185Z',
+    '2025-05-08T14:11:59.604Z',
+    '2025-07-26T17:01:17.194Z',
+    '2025-09-01T23:36:17.929Z',
+    '2025-09-08T10:51:36.790Z',
   ],
   currency: 'EUR',
   locale: 'pt-PT',
@@ -31,14 +31,14 @@ const account2 = {
   pin: 2222,
 
   movementsDates: [
-    '2019-11-01T13:15:33.035Z',
-    '2019-11-30T09:48:16.867Z',
-    '2019-12-25T06:04:23.907Z',
-    '2020-01-25T14:18:46.235Z',
-    '2020-02-05T16:33:06.386Z',
-    '2020-04-10T14:43:26.374Z',
-    '2020-06-25T18:49:59.371Z',
-    '2020-07-26T12:01:20.894Z',
+    '2024-11-01T13:15:33.035Z',
+    '2024-11-30T09:48:16.867Z',
+    '2024-12-25T06:04:23.907Z',
+    '2025-01-25T14:18:46.235Z',
+    '2025-02-05T16:33:06.386Z',
+    '2025-04-10T14:43:26.374Z',
+    '2025-06-25T18:49:59.371Z',
+    '2025-07-26T12:01:20.894Z',
   ],
   currency: 'USD',
   locale: 'en-US',
@@ -51,17 +51,17 @@ const account3 = {
   pin: 3333,
 
   movementsDates: [
-    '2019-11-01T13:15:33.035Z',
-    '2019-11-30T09:48:16.867Z',
-    '2019-12-25T06:04:23.907Z',
-    '2020-01-25T14:18:46.235Z',
-    '2020-02-05T16:33:06.386Z',
-    '2020-04-10T14:43:26.374Z',
-    '2020-06-25T18:49:59.371Z',
-    '2020-07-26T12:01:20.894Z',
+    '2024-1-01T13:15:33.035Z',
+    '2024-11-30T09:48:16.867Z',
+    '2024-03-13T06:04:23.907Z',
+    '2025-01-25T14:18:46.235Z',
+    '2025-02-05T16:33:06.386Z',
+    '2025-04-11T14:43:26.374Z',
+    '2025-06-5T18:49:59.371Z',
+    '2025-07-23T12:01:20.894Z',
   ],
   currency: 'pound Sterling',
-  locale: 'en-Uk',
+  locale: 'en-GB',
 };
 
 const account4 = {
@@ -70,14 +70,14 @@ const account4 = {
   interestRate: 1,
   pin: 4444,
   movementsDates: [
-    '2019-11-01T13:15:33.035Z',
-    '2019-11-30T09:48:16.867Z',
-    '2019-12-25T06:04:23.907Z',
-    '2020-01-25T14:18:46.235Z',
-    '2020-02-05T16:33:06.386Z',
-    '2020-04-10T14:43:26.374Z',
-    '2020-06-25T18:49:59.371Z',
-    '2020-07-26T12:01:20.894Z',
+    '2024-11-01T13:15:33.035Z',
+    '2024-1-30T09:48:16.867Z',
+    '2024-12-2T06:04:23.907Z',
+    '2025-01-25T14:18:46.235Z',
+    '2025-12-05T16:33:06.386Z',
+    '2025-04-10T14:43:26.374Z',
+    '2025-06-25T18:49:59.371Z',
+    '2025-06-26T12:01:20.894Z',
   ],
   currency: 'Australian dollar',
   locale: 'AUS-aus',
@@ -111,10 +111,22 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
+//Formating
+const formatDates = function (date, locale) {
+  const calcDaysPassed = (date1, date2) =>
+    Math.round(Math.abs(date1 - date2) / (1000 * 60 * 60 * 24));
+
+  const daysPassed = calcDaysPassed(new Date(), date);
+
+  if (daysPassed === 0) return 'Today';
+  if (daysPassed === 1) return 'Tommorow';
+  if (daysPassed <= 7) return `${daysPassed} days ago`;
+  return new Intl.DateTimeFormat(locale).format(date);
+};
+
 // Display transactions
 const displayMovements = function (acc, sort = false) {
   containerMovements.innerHTML = '';
-
   const movs = sort
     ? acc.movements.slice().sort((a, b) => a - b)
     : acc.movements;
@@ -123,10 +135,7 @@ const displayMovements = function (acc, sort = false) {
     const type = mov > 0 ? 'deposit' : 'withdrawal';
 
     const date = new Date(acc.movementsDates[i]);
-    const day = `${date.getDate()}`.padStart(2, 0);
-    const month = `${date.getMonth() + 1}`.padStart(2, 0);
-    const year = date.getFullYear();
-    const displayDate = `${day}/${month}/${year}`;
+    const displayDate = formatDates(date, acc.locale);
 
     const html = `<div class="movements">
         <div class="movements__row">
@@ -195,10 +204,32 @@ const createUsernames = function (accs) {
 
 createUsernames(accounts);
 
+const startLoginTimer = function () {
+  const tick = function () {
+    const min = String(Math.trunc(time / 60)).padStart(2, 0);
+    const sec = String(time % 60).padStart(2, 0);
 
-// ###Event handling
-let currentAccount; // makes shitt dynamic
+    labelTimer.textContent = `${min}:${sec}`;
 
+    if (time === 0) {
+      clearInterval(timer);
+      labelWelcome.textContent = `Login to get started`;
+      containerApp.style.opacity = 0;
+    }
+    //Decrementing Time
+    time--;
+  };
+  let time = 600;
+
+  tick();
+  const timer = setInterval(tick, 1000);
+  return timer;
+};
+
+// ###Event handlers
+let currentAccount, timer; // makes shitt dynamic
+
+//Login
 btnLogin.addEventListener('click', function (e) {
   e.preventDefault();
   currentAccount = accounts.find(
@@ -214,15 +245,25 @@ btnLogin.addEventListener('click', function (e) {
 
     // Create current date and time
     const now = new Date();
-    const day = `${now.getDate()}`.padStart(2, 0);
-    const month = `${now.getMonth() +1 }`.padStart(2, 0);
-    const year = now.getFullYear();
-    const hour = `${now.getHours()}`.padStart(2,0);
-    const min = `${now.getMinutes()}`.padStart(2,0);
-    labelDate.textContent = `${day}/${month}/${year}, ${hour}:${min}`;
-
+    const options = {
+      hour: 'numeric',
+      minute: 'numeric',
+      day: 'numeric',
+      month: 'numeric',
+      year: 'numeric',
+    };
+    const locale = navigator.language;
+    labelDate.textContent = new Intl.DateTimeFormat(
+      currentAccount.locale,
+      options
+    ).format(now);
+    //Clear input fields
     inputLoginUsername.value = inputLoginPin.value = '';
     inputLoginPin.blur();
+
+    //Timer
+    if (timer) clearInterval(timer);
+    timer = startLoginTimer();
 
     updateUI(currentAccount);
   }
@@ -252,6 +293,10 @@ btnTransfer.addEventListener('click', function (e) {
     receiverAcc.movementsDates.push(new Date().toISOString());
 
     updateUI(currentAccount);
+
+    // Reset Timer
+    clearInterval(timer);
+    timer = startLoginTimer();
   }
 });
 
@@ -261,13 +306,18 @@ btnLoan.addEventListener('click', function (e) {
   const amount = Math.floor(inputLoanAmount.value);
 
   if (amount > 0 && currentAccount.movements.some(mov => mov >= amount * 0.1)) {
-    //add the amount
-    currentAccount.movements.push(amount);
+    setTimeout(function () {
+      //add the amount
+      currentAccount.movements.push(amount);
 
-    // load date hai
-    currentAccount.movementsDates.push(new Date().toISOString());
+      // load date hai
+      currentAccount.movementsDates.push(new Date().toISOString());
 
-    updateUI(currentAccount);
+      updateUI(currentAccount);
+
+      clearInterval(timer);
+      timer = startLoginTimer();
+    }, 3000);
   }
   inputLoanAmount.value = '';
 });
